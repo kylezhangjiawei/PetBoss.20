@@ -29,7 +29,7 @@
       </div>
       <!-- 商标 -->
       <div class="footer">
-        <span>&copy;2017 用到云 {{copy}}</span>
+        <span>&copy;2018 用到云 {{copy}}</span>
       </div>
     </div>
   </div>
@@ -62,6 +62,25 @@
       },
       /* 登陆 */
       sign(){
+        if(this.phones === '' && this.passwords === ''){
+          this.$store.dispatch('getDatas',{
+            states:true,
+            msg:'请输入手机号与密码哦！'
+          })
+          return false;
+        }else if(this.phones === ''){
+          this.$store.dispatch('getDatas',{
+            states:true,
+            msg:'请输入手机号！'
+          })
+          return false;
+        }else if(this.passwords === ''){
+          this.$store.dispatch('getDatas',{
+            states:true,
+            msg:'请输入密码！'
+          })
+          return false;
+        }
         console.log(this.phones,this.passwords)
         let time = Date.parse(new Date()).toString().substring(0,10);
         let obj = {
@@ -79,8 +98,7 @@
           system_id:85916832,
           sign:this.objKeySort(obj)
         }).then(() => {
-          //
-          // this.$router.push({path:'/Index'})
+          this.$router.push({path:'/index'})
         })
       }
     }

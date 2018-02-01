@@ -8,8 +8,8 @@ import axios from 'axios'
 import store from './vuex'
 import YDUI from 'vue-ydui'
 import '../static/icon/iconfont.css'
-
-
+import { Confirm, Alert, Toast, Notify, Loading } from 'vue-ydui/dist/lib.rem/dialog';
+import echarts from 'echarts'
 /* 启用Vuex状态管理 */
 Vue.use(Vuex);
 
@@ -30,6 +30,9 @@ Vue.prototype.objKeySort = objKeySort;
 
 /* 设置axios调用方式 */
 Vue.prototype.$http = axios;
+
+/* 设置echarts调用方法 */
+Vue.prototype.$echarts = echarts;
 
 /* 版本号 */
 global.copy = "1.0.14";
@@ -57,6 +60,7 @@ axios.interceptors.request.use(config =>{
   // }else{
   //   console.log('oJBk')
   // }
+  Loading.open('正在加载...');
   return config
 }),error =>{
   // loadinginstace=Indicator.close();
@@ -64,12 +68,14 @@ axios.interceptors.request.use(config =>{
   //   message:'加载超时',
   //   duration:2000
   // })
+  Loading.close();
   console.log(error);
   return Promise.reject(error);
 }
 /* 请求数据后 */
 axios.interceptors.response.use(data =>{
   // loadinginstace=Indicator.close();
+  Loading.close();
   console.log(data)
   return data
 }),error =>{
@@ -78,10 +84,10 @@ axios.interceptors.response.use(data =>{
   //   message:'加载失败',
   //   duration:2000
   // })
+  Loading.close();
   console.log(error)
   return Promise.reject(error)
 }
-
 /* 时间格式化 */
 Date.prototype.format = function(fmt) {
   let o = {
@@ -103,3 +109,19 @@ Date.prototype.format = function(fmt) {
   }
   return fmt;
 };
+/* 折叠面板（构造器） */
+const accordion = Vue.extend({
+  template: `
+        <div class="foldContainer">
+            <div class="foldHeader">
+                <slot name="headerLeft"></slot>
+                <slot name="headerRight"></slot>
+            </div>
+            <div class="foldBody">      
+                <slot name="body"></slot>   
+            </div>
+        </div>
+  `
+})
+Vue.component('fold',accordion);
+

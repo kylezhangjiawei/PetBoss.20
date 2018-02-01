@@ -1,5 +1,4 @@
 import axios from 'axios'
-import {Notify} from 'vue-ydui/dist/lib.rem/dialog'
 const state={
   sign:localStorage.getItem('sign') || {},
   storeId:localStorage.getItem('storeId') || {},
@@ -68,19 +67,12 @@ const actions ={
       } else {
         let ids = '';
         commit('userStoreId',ids);
-        // Toast({
-        //   message: res.data.err_msg,
-        //   position: 'top',
-        //   duration: 2000,
-        //   className:'wrongTip'
-        // });
-        notify({
-          mes: '5秒后自动消失，点我也可以消失！',
-          timeout: 5000,
-          callback: () => {
-            console.log('我走咯！');
-          }
-        });
+        commit('dialogState',true);
+        commit('dialogMsg',res.data.err_msg);
+        setTimeout(()=>{
+          commit('dialogState',false);
+          commit('dialogMsg','');
+        },2000)
       }
     }).catch((err) => {
       console.log(err)
