@@ -34,7 +34,7 @@
       </div>
     </div>
     <div class="footer">
-      <span>&copy;2018 用到云 {{copy}}</span>
+      <span>&copy;2018 用道云 {{copy}}</span>
     </div>
   </div>
 </template>
@@ -78,7 +78,7 @@
           system_id: 85916832,
           timestamp: time,
           phone: this.user.phone,
-          type: 1
+          type: 2
         };
         this.$http({
           method: 'post',
@@ -89,7 +89,7 @@
             system_id: 85916832,
             timestamp: time,
             phone: this.user.phone,
-            type: 1
+            type: 2
           }
         }).then( respone => {
           console.log(respone);
@@ -105,7 +105,7 @@
           } else if (respone.data.err_code === "0002") {
             this.$store.dispatch('getDatas',{
               states:true,
-              msg:'该号码已注册，请登录！'
+              msg:respone.data.err_msg
             })
           } else {
             this.$store.dispatch('getDatas',{
@@ -211,7 +211,7 @@
       }
     }
     .container{
-      margin-top: .32rem;
+     /* margin-top: .32rem;*/
       & > div:nth-of-type(1) {
         background-color: #ffffff;
         font-size: 0.3rem;

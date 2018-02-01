@@ -51,7 +51,7 @@
       </div>
     </div>
     <div class="footer">
-      <span>&copy;2018 用到云 {{copy}}</span>
+      <span>&copy;2018 用道云 {{copy}}</span>
     </div>
   </div>
 </template>
@@ -254,7 +254,7 @@
       }
     }
     .container {
-      margin-top: .32rem;
+     /* margin-top: .32rem;*/
       & > div:nth-of-type(1) {
         background-color: #ffffff;
         font-size: 0.3rem;

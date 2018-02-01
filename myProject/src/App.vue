@@ -74,7 +74,6 @@ export default {
   }
   .foldBody{
     background-color: #ffffff;
-    padding: 0 .3rem;
-    border-bottom: 1px solid #e8e8e8;
+    /*border-bottom: 1px solid #e8e8e8;*/
   }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="homePage">
     <header>
-      <i class="icon-fenlei"></i>
+      <i class="icon-fenlei" @click="leftModal = true"></i>
       <span>{{shopName}}</span>
       <i class="icon-pinglun"></i>
     </header>
@@ -61,6 +61,19 @@
         </table>
       </div>
     </div>
+    <!-- 左侧弹窗 -->
+    <yd-popup v-model="leftModal" position="left" width="70%">
+      <div class="shopIcon">
+        <img :src="headerIcon" alt="头像">
+        <p>{{shopName}}</p>
+      </div>
+      <div class="signOut">
+        <button type="button" @click="goOut">退出账号</button>
+      </div>
+      <div class="footer">
+        <span>&copy;2018 用道云 {{copy}}</span>
+      </div>
+    </yd-popup>
   </div>
 </template>
 
@@ -70,10 +83,14 @@
     data() {
       return {
         shopName: '',//店铺名称
+        leftModal:false, //左侧模态框
+        headerIcon:require('../../../assets/shop_logo.png'), //店铺头像
+        copy: '',//版本号
       }
     },
     created() {
       this.shopName = localStorage.getItem('Name');
+      this.copy = copy;
     },
     mounted(){
       this.dealStatements();
@@ -178,6 +195,11 @@
         // 使用刚指定的配置项和数据显示图表。
         this.myChart.setOption(option);
         window.onresize = this.myChart.resize;
+      },
+      /* 退出账号 */
+      goOut(){
+        this.$router.push({path:'/'});
+        localStorage.clear();
       }
     }
   }
@@ -200,6 +222,7 @@
       top: 0;
       left: 0;
       right: 0;
+      z-index: 1;
       color: #ffffff;
       & > i:nth-of-type(1) {
         position: absolute;
@@ -318,6 +341,60 @@
               }
             }
           }
+        }
+      }
+    }
+  }
+</style>
+<style lang="scss">
+  .homePage{
+    .yd-popup-content{
+      background-color: #252834;
+      .shopIcon{
+        margin-top: .6rem;
+        text-align: center;
+        &>img{
+          border-radius: 50%;
+          width: 1.2rem;
+          height: 1.2rem;
+          border: 5px solid #ffffff ;
+        }
+        &>p{
+          margin-top: .22rem;
+          margin-bottom: .95rem;
+          font-size: .36rem;
+          color: #ffffff;
+        }
+      }
+      .signOut{
+        text-align: center;
+        position: absolute;
+        overflow: hidden;
+        bottom: 1.15rem;
+        left: 0;
+        right: 0;
+        &>button{
+          width: 2.75rem;
+          height: .68rem;
+          font-size: .26rem;
+          color: #999fb4;
+          border-radius: 5px;
+          border: 1px solid #3c404e;
+          background-color: rgba(255,255,255,0.04);
+        }
+      }
+      .footer {
+        font-size: .2rem;
+        color: #60667c;
+        width: 100%;
+        position: absolute;
+        height: .6rem;
+        line-height: .6rem;
+        bottom: 0;
+        & > span {
+          display: inline-block;
+          width: 100%;
+          text-align: center;
         }
       }
     }

@@ -9,9 +9,17 @@ import store from './vuex'
 import YDUI from 'vue-ydui'
 import '../static/icon/iconfont.css'
 import { Confirm, Alert, Toast, Notify, Loading } from 'vue-ydui/dist/lib.rem/dialog';
+import {Popup} from 'vue-ydui/dist/lib.rem/popup';
+import {CitySelect} from 'vue-ydui/dist/lib.rem/cityselect';
 import echarts from 'echarts'
+
 /* 启用Vuex状态管理 */
 Vue.use(Vuex);
+
+/* YDUI-Popup */
+Vue.component(Popup.name, Popup);
+/* YDUI省市联动 */
+Vue.component(CitySelect.name, CitySelect);
 
 /* 启用YDUI */
 Vue.use(YDUI);
@@ -52,13 +60,16 @@ new Vue({
 //全局注册数据加载前动画
 axios.defaults.timeout =5000;
 // var loadinginstace
-/* 请求数据前 */
+// http request 拦截器
 axios.interceptors.request.use(config =>{
-  console.log(config.data)
+  //console.log(config.data)
   // if(config.data.method=="login"){
   //   loadinginstace = Indicator.open('加载中..');
   // }else{
   //   console.log('oJBk')
+  // }
+  // if(localStorage.getItem('storeId') && localStorage.getItem('storeId') !== ""){
+  //   console.log('过不去的,兄dei~')
   // }
   Loading.open('正在加载...');
   return config
@@ -69,14 +80,14 @@ axios.interceptors.request.use(config =>{
   //   duration:2000
   // })
   Loading.close();
-  console.log(error);
+  //console.log(error);
   return Promise.reject(error);
 }
-/* 请求数据后 */
+// http response 拦截器
 axios.interceptors.response.use(data =>{
   // loadinginstace=Indicator.close();
   Loading.close();
-  console.log(data)
+  //console.log(data)
   return data
 }),error =>{
   // loadinginstace=Indicator.close();
@@ -85,7 +96,7 @@ axios.interceptors.response.use(data =>{
   //   duration:2000
   // })
   Loading.close();
-  console.log(error)
+  //console.log(error)
   return Promise.reject(error)
 }
 /* 时间格式化 */

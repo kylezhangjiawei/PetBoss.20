@@ -1,7 +1,6 @@
 <template>
   <div class="performance">
     <header>
-      <i class="icon-fanhui"></i>
       <span>经营数据</span>
     </header>
     <!-- 内容 -->
@@ -70,7 +69,7 @@
           </tr>
           </thead>
           <tbody>
-          <tr>
+          <tr @click="goDaily()">
             <td>01.01</td>
             <td>12635</td>
             <td>9854%</td>
@@ -195,6 +194,10 @@
         // 使用刚指定的配置项和数据显示图表。
         this.myChart.setOption(option);
         window.onresize = this.myChart.resize;
+      },
+      /* 日报 */
+      goDaily(){
+        this.$router.push({path:'/daily'})
       }
     }
   }
@@ -216,13 +219,8 @@
       top: 0;
       left: 0;
       right: 0;
+      z-index: 1;
       color: #ffffff;
-      & > i:nth-of-type(1) {
-        position: absolute;
-        font-size: .42rem;
-        left: .28rem;
-        color: #ffffff;
-      }
     }
     .container{
       margin-top: 1rem;

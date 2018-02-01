@@ -8,6 +8,8 @@ import homePage from '../components/index/homePage/homePage'
 import people from '../components/index/people'
 import product from  '../components/index/product'
 import performance from '../components/index/performance'
+import daily from '../components/index/performance/daily'
+import dailyDetail from '../components/index/performance/dailyDetail/dailyDeatil'
 Vue.use(Router)
 
 const router= new Router({
@@ -40,21 +42,31 @@ const router= new Router({
         {path:'/performance', name:'performance',component:performance},
       ]
     },
+    {
+      path: '/daily',
+      name: 'daily',
+      component: daily
+    },
+    {
+      path: '/dailyDetail',
+      name: 'dailyDetail',
+      component: dailyDetail
+    },
   ]
 })
 router.beforeEach((to,from,next) => {
   //判断是否需要登录权限
   if (to.matched.some(record => record.meta.requiresAuth)) {
     //判断是否登录
-    if(localStorage.getItem('storeId') ===''){
+    if(localStorage.getItem('storeId') && localStorage.getItem('storeId') !== "" ){
+      next();
+      console.log('放行')
+    }else{  //如果没有登录跳转到登录页面
       next({
         path:'/',
         query:{redirect: to.fullPath}
       })
-      // console.log('yes')
-    }else{  //如果没有登录跳转到登录页面
-      next()
-      // console.log('what')
+      console.log('拦截');
     }
   }else {
     next()

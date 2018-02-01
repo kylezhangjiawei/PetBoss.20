@@ -25,7 +25,7 @@
               {
                 name:"people",
                 path:'/people',
-                icon:'icon-renyuan',
+                icon:'icon-renyuanguanli',
                 msg:'人员'
               },
               {
