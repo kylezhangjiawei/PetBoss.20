@@ -198,11 +198,11 @@
     & > header {
       height: 1rem;
       font-size: .36rem;
-      color: #333333;
+      color: #ffffff;
       border-bottom: 1px solid #e8e8e8;
       text-align: center;
       line-height: 1rem;
-      background-color: #ffffff;
+      background-color: #4B5060;
       position: relative;
       & > i {
         position: absolute;

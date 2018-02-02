@@ -29,6 +29,16 @@ export default {
 </script>
 
 <style>
+ /* !* 公共变量 *!
+  !* 文字颜色 *!
+  $txtC1:#333333;
+  $txtC2:#666666;
+  $txtC3:#888888;
+  $txtC4:#999999;
+  !* border颜色 *!
+  $borC1:#e8e8e8;
+  !* 背景颜色 *!
+  $bacC1:#fff;*/
   body{
     background-color: #efefef;
   }
@@ -41,6 +51,7 @@ export default {
   color: #2c3e50;
   /* margin-top:20px; */
   height: 100%;
+
 }
   /* placeholder颜色 */
   ::-webkit-input-placeholder { color:#cccccc; } /* chrome */

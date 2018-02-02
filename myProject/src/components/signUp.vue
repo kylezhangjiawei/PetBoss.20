@@ -42,13 +42,30 @@
           </li>
           <li>
             <span>店铺地址</span>
-            <input type="text" placeholder="请输入店铺地址" v-model="user.shopAddress">
+            <!--<input type="text" placeholder="请输入店铺地址" v-model="user.shopAddress">-->
+            <div>
+              <yd-cell-group>
+                <yd-cell-item arrow>
+                  <input slot="right" type="text" @click.stop="show1 = true" v-model="model" readonly placeholder="请选择收货地址">
+                </yd-cell-item>
+              </yd-cell-group>
+              <yd-cityselect v-model="show1" :callback="result1" :items="district"></yd-cityselect>
+            </div>
+            <i class="icon-gengduo"></i>
           </li>
         </ul>
       </div>
       <div>
+        <textarea  cols="30" rows="3" class="textContainer" placeholder="请输入详细地址..." v-model="user.shopAddress">
+
+        </textarea>
+      </div>
+      <div>
         <button type="button" @click="register()">注册</button>
       </div>
+    </div>
+    <div class="test">
+
     </div>
     <div class="footer">
       <span>&copy;2018 用道云 {{copy}}</span>
@@ -57,6 +74,7 @@
 </template>
 
 <script>
+  import District from 'ydui-district/dist/jd_province_city_area_id';
   export default {
     name: "sign-up",
     data() {
@@ -73,6 +91,9 @@
         },
         time:60, //验证码倒计时
         getCode:true, //验证码转换
+        show1: false,
+        model: '',
+        district: District
       }
     },
     created() {
@@ -84,11 +105,11 @@
         this.$router.go(-1);
       },
       /* 获取验证码 */
-      getMyCode(){
-        if(this.user.phone === ''){
-          this.$store.dispatch('getDatas',{
-            states:true,
-            msg:'请输入手机号！'
+      getMyCode() {
+        if (this.user.phone === '') {
+          this.$store.dispatch('getDatas', {
+            states: true,
+            msg: '请输入手机号！'
           })
           return false;
         }
@@ -111,7 +132,7 @@
             phone: this.user.phone,
             type: 1
           }
-        }).then( respone => {
+        }).then(respone => {
           console.log(respone);
           if (respone.data.err_code === "0000") {
             this.getCode = false;
@@ -123,85 +144,87 @@
               }
             }, 1000)
           } else if (respone.data.err_code === "0002") {
-            this.$store.dispatch('getDatas',{
-              states:true,
-              msg:'该号码已注册，请登录！'
+            this.$store.dispatch('getDatas', {
+              states: true,
+              msg: '该号码已注册，请登录！'
             })
           } else {
-            this.$store.dispatch('getDatas',{
-              states:true,
-              msg:respone.data.err_msg
+            this.$store.dispatch('getDatas', {
+              states: true,
+              msg: respone.data.err_msg
             })
           }
 
-        }).catch( err => {
+        }).catch(err => {
           console.log(err)
         })
       },
       /* 注册按钮 */
-      register(){
-        if(this.user.name === ''){
-          this.$store.dispatch('getDatas',{
-            states:true,
-            msg:'请输入姓名！'
+      register() {
+        if (this.user.name === '') {
+          this.$store.dispatch('getDatas', {
+            states: true,
+            msg: '请输入姓名！'
           })
           return false;
-        }else if(this.user.phone === ''){
-          this.$store.dispatch('getDatas',{
-            states:true,
-            msg:'请输入手机号！'
+        } else if (this.user.phone === '') {
+          this.$store.dispatch('getDatas', {
+            states: true,
+            msg: '请输入手机号！'
           })
           return false;
-        }else if(this.user.code === ''){
-          this.$store.dispatch('getDatas',{
-            states:true,
-            msg:'请输入验证码！'
+        } else if (this.user.code === '') {
+          this.$store.dispatch('getDatas', {
+            states: true,
+            msg: '请输入验证码！'
           })
           return false;
-        }else if(this.user.password === ''){
-          this.$store.dispatch('getDatas',{
-            states:true,
-            msg:'请输入密码！'
+        } else if (this.user.password === '') {
+          this.$store.dispatch('getDatas', {
+            states: true,
+            msg: '请输入密码！'
           })
           return false;
-        }else if(this.user.passwordTwo === ''){
-          this.$store.dispatch('getDatas',{
-            states:true,
-            msg:'请输入确认密码！'
+        } else if (this.user.passwordTwo === '') {
+          this.$store.dispatch('getDatas', {
+            states: true,
+            msg: '请输入确认密码！'
           })
           return false;
-        }else if(this.user.shopName === ''){
-          this.$store.dispatch('getDatas',{
-            states:true,
-            msg:'请输入店铺名称！'
+        } else if (this.user.shopName === '') {
+          this.$store.dispatch('getDatas', {
+            states: true,
+            msg: '请输入店铺名称！'
           })
           return false;
-        }else if(this.user.shopAddress === ''){
-          this.$store.dispatch('getDatas',{
-            states:true,
-            msg:'请输入店铺地址！'
+        } /*else if (this.user.shopAddress === '') {
+          this.$store.dispatch('getDatas', {
+            states: true,
+            msg: '请输入店铺地址！'
+          })
+          return false;
+        }*/
+        if (this.user.password !== this.user.passwordTwo) {
+          this.$store.dispatch('getDatas', {
+            states: true,
+            msg: '两次密码输入不一致！'
           })
           return false;
         }
-        if(this.user.password !== this.user.passwordTwo){
-          this.$store.dispatch('getDatas',{
-            states:true,
-            msg:'两次密码输入不一致！'
-          })
-          return false;
-        }
+        /* 拼接地址 */
+        let addAddress = this.model+this.user.shopAddress;
         /* 接口 */
         let time = Date.parse(new Date()).toString().substring(0, 10);
         let obj = {
           method: 'register',
           system_id: 85916832,
           timestamp: time,
-          address: this.user.shopAddress,
+          address: addAddress,
           code: this.user.code,
           name: this.user.shopName,
           phone: this.user.phone,
           password: this.user.password,
-          user_name:this.user.name
+          user_name: this.user.name
         };
         this.$http({
           method: 'post',
@@ -211,27 +234,32 @@
             method: 'register',
             system_id: 85916832,
             timestamp: time,
-            address: this.user.shopAddress,
+            address: addAddress,
             code: this.user.code,
             name: this.user.shopName,
             phone: this.user.phone,
             password: this.user.password,
-            user_name:this.user.name
+            user_name: this.user.name
           }
-        }).then( res => {
+        }).then(res => {
           console.log(res)
           if (res.data.err_code == "0000") {
-             this.$router.push({path: '/'})
-          }else {
-            this.$store.dispatch('getDatas',{
-              states:true,
-              msg:res.data.err_msg
+            this.$router.push({path: '/'})
+          } else {
+            this.$store.dispatch('getDatas', {
+              states: true,
+              msg: res.data.err_msg
             })
           }
-        }).catch( err => {
+        }).catch(err => {
           console.log(err)
         })
-      }
+      },
+
+
+      result1(ret) {
+        this.model = ret.itemName1 + ' ' + ret.itemName2 + ' ' + ret.itemName3;
+      },
     }
   }
 </script>
@@ -241,12 +269,12 @@
     & > header {
       height: 1rem;
       font-size: .36rem;
-      color: #333333;
       border-bottom: 1px solid #e8e8e8;
       text-align: center;
       line-height: 1rem;
-      background-color: #ffffff;
+      background-color: #4B5060;
       position: relative;
+      color: #ffffff;
       & > i {
         position: absolute;
         font-size: .3rem;
@@ -312,11 +340,32 @@
             }
           }
           & > li:last-child {
-            border-bottom: none;
+            /*border-bottom: none;*/
+            &>div{
+              display: inline-block;
+              input{
+                border: none;
+                width: 4.8rem;
+              }
+              i{
+                display: inline-block;
+                font-size: .22rem;
+              }
+            }
           }
         }
       }
-      & > div:nth-of-type(3) {
+      &>div:nth-of-type(3){
+        background-color: #ffffff;
+        .textContainer{
+          width: 100%;
+          border: none;
+          color: #333333;
+          font-size: .3rem;
+          padding: .3rem;
+        }
+      }
+      & > div:nth-of-type(4) {
         margin-top: .42rem;
         text-align: center;
         & > button {
