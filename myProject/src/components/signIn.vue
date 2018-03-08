@@ -23,19 +23,21 @@
       </div>
       <!-- 注册 忘记密码 -->
       <div>
-        <span @click="goSignUp()">立即注册</span>
-        <hr size="20" width="1" color="#cccccc" style="display: inline-block">
-        <span @click="goResetPassword()">忘记密码</span>
+        <!--<span @click="goSignUp()">立即注册</span>
+        <hr size="20" width="1" color="#cccccc" style="display: inline-block">-->
+        <span @click="goResetPassword()" style="margin-right: 0">忘记密码</span><!-- 样式为临时增加，开放注册后要去掉 -->
       </div>
       <!-- 商标 -->
       <div class="footer">
-        <span>&copy;2018 用道云 {{copy}}</span>
+        <span>&copy; 2018 用道云 {{copy}}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+  import {Confirm, Alert, Toast, Notify, Loading} from 'vue-ydui/dist/lib.rem/dialog';
+  import { mapGetters } from 'vuex'
   export default {
     name: 'logoIn',
     data() {
@@ -43,13 +45,20 @@
         logo: require('../../src/assets/logo2_03.png'), //登录页面logo
         phoneIcon: require('../../src/assets/icon_03.png'), //登录页面手机
         passwordIcon: require('../../src/assets/icon_06.png'), //登录页面密码
-        copy: '',//版本号
         phones:'',//手机号
         passwords:'',//密码
       }
     },
+    computed:{
+      ...mapGetters([
+        'copy'
+      ])
+    },
     created() {
-      this.copy = copy;
+      if (localStorage.getItem('storeId') && Number(localStorage.getItem('userOverdue')) === 0) {
+        this.$router.push({path:'/index'});
+        console.log('yes')
+      }
     },
     methods: {
       /* 注册 */
@@ -98,7 +107,12 @@
           system_id:85916832,
           sign:this.objKeySort(obj)
         }).then(() => {
-          this.$router.push({path:'/index'})
+          if(Number(localStorage.getItem('userOverdue')) === 0){
+            this.$router.push({path:'/index'})
+          }else{
+            Alert({mes:'请激活系统！'});
+          }
+          
         })
       }
     }

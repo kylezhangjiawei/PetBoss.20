@@ -1,83 +1,87 @@
 <template>
-  <div class="homePage">
-    <header>
-      <i class="icon-fenlei" @click="leftModal = true"></i>
-      <span>{{shopName}}</span>
-      <i class="icon-pinglun"></i>
-    </header>
-    <div class="container">
-      <!-- 页头数据块儿 -->
-      <div class="dataChunk">
-        <div>
-          <dl>
-            <dt>今日收入</dt>
-            <dd>100125.85</dd>
-          </dl>
+  <yd-pullrefresh :callback="loadList" ref="pullrefreshDemo" drop-text="下拉刷新">
+    <div class="homePage">
+      <header>
+        <i class="icon-fenlei" @click="leftModal = true"></i>
+        <span>{{shopName}}</span>
+        <i class="icon-pinglun"></i>
+      </header>
+      <div class="container">
+        <!-- 页头数据块儿 -->
+        <div class="dataChunk">
+          <div>
+            <dl>
+              <dt>今日收入</dt>
+              <dd>{{allDatas ? allDatas.today_proportion.store_turnover : ''}}</dd>
+            </dl>
+          </div>
+          <div>
+            <dl>
+              <dt>营业额</dt>
+              <dd>{{allDatas ? allDatas.today_proportion.store_income : ''}}</dd>
+            </dl>
+          </div>
+          <div>
+            <dl>
+              <dt>销售占比</dt>
+              <dd>{{allDatas ? allDatas.today_proportion.goods_proportion+'%' : ''}}</dd>
+            </dl>
+          </div>
+          <div>
+            <dl>
+              <dt>会员消费占比</dt>
+              <dd>{{allDatas ? allDatas.today_proportion.member_proportion+'%' : ''}}</dd>
+            </dl>
+          </div>
         </div>
-        <div>
-          <dl>
-            <dt>营业额</dt>
-            <dd>120313.5</dd>
-          </dl>
+        <!-- 交易额图表 -->
+        <div class="dealStatement">
+          <div id="deal" style="width: 100%;height: 305px"></div>
         </div>
-        <div>
-          <dl>
-            <dt>销售占比</dt>
-            <dd>63%</dd>
-          </dl>
+        <!-- 会员占比 -->
+        <div class="memProportion">
+          <span>会员占比</span><span>会员总数 : {{allDatas.member_num}}人</span>
         </div>
-        <div>
-          <dl>
-            <dt>会员消费占比</dt>
-            <dd>25%</dd>
-          </dl>
+        <!-- 表单 -->
+        <div class="tables">
+          <table>
+            <thead>
+            <tr>
+              <td>类型</td>
+              <td>人数</td>
+              <td>占比</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="item in allDatas.member_proportion">
+              <td>{{item.card}}</td>
+              <td>{{item.num}}</td>
+              <td>{{item.proportion}}</td>
+            </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-      <!-- 交易额图表 -->
-      <div class="dealStatement">
-        <div id="deal" style="width: 100%;height: 305px"></div>
-      </div>
-      <!-- 会员占比 -->
-      <div class="memProportion">
-        <span>会员占比</span><span>会员总数 : 10000人</span>
-      </div>
-      <!-- 表单 -->
-      <div class="tables">
-        <table>
-          <thead>
-          <tr>
-            <td>类型</td>
-            <td>人数</td>
-            <td>占比</td>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td>普通卡</td>
-            <td>400</td>
-            <td>40%</td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
+      <!-- 左侧弹窗 -->
+      <yd-popup v-model="leftModal" position="left" width="70%">
+        <div class="shopIcon">
+          <img :src="headerIcon" alt="头像">
+          <p>{{shopName}}</p>
+        </div>
+        <div class="signOut">
+          <button type="button" @click="goOut">退出账号</button>
+        </div>
+        <div class="footer">
+          <span>&copy;2018 用道云 {{copy}}</span>
+        </div>
+      </yd-popup>
     </div>
-    <!-- 左侧弹窗 -->
-    <yd-popup v-model="leftModal" position="left" width="70%">
-      <div class="shopIcon">
-        <img :src="headerIcon" alt="头像">
-        <p>{{shopName}}</p>
-      </div>
-      <div class="signOut">
-        <button type="button" @click="goOut">退出账号</button>
-      </div>
-      <div class="footer">
-        <span>&copy;2018 用道云 {{copy}}</span>
-      </div>
-    </yd-popup>
-  </div>
+  </yd-pullrefresh>
+
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   export default {
     name: "homePage",
     data() {
@@ -85,12 +89,17 @@
         shopName: '',//店铺名称
         leftModal:false, //左侧模态框
         headerIcon:require('../../../assets/shop_logo.png'), //店铺头像
-        copy: '',//版本号
+        allDatas:'',//所有数据
       }
+    },
+    computed:{
+      ...mapGetters([
+        'copy'
+      ])
     },
     created() {
       this.shopName = localStorage.getItem('Name');
-      this.copy = copy;
+      this.getAllData();
     },
     mounted(){
       this.dealStatements();
@@ -122,7 +131,7 @@
           xAxis:  {
             type:  'category',
             boundaryGap:  false,
-            data:  ['01-11',  '01-12',  '01-13',  '01-14',  '01-15',  '01-16',  '01-17']
+            data:  []
           },
           yAxis:  {
             type:  'value',
@@ -141,7 +150,6 @@
             name:  '收入',
             type:  'line',
             smooth:  'true',
-            stack:  '总量',
             label:  {
               normal:  {
                 show:  false,
@@ -159,13 +167,12 @@
                 }])
               }
             },
-            data:  [120,  132,  101,  134,  90,  230,  210]
+            data:  []
           },
             {
               name:  '营业额',
               type:  'line',
               smooth:  'true',
-              stack:  '总量',
               label:  {
                 normal:  {
                   show:  false,
@@ -188,7 +195,7 @@
                   }])
                 }
               },
-              data:  [220,  182,  191,  234,  290,  330,  310]
+              data:  []
             }
           ]
         };
@@ -200,8 +207,89 @@
       goOut(){
         this.$router.push({path:'/'});
         localStorage.clear();
+      },
+      /* 获取数据 */
+      getAllData(){
+        this.$http.post('https://api.yongdaoyun.com/special/pet/statistical/manage_index_info.php', this.sendData()).then(res =>{
+          console.log(res);
+          if(res.data.err_code === "0000"){
+            this.allDatas = res.data.data;
+            let aaa=[];
+            let bbb =[];//收入
+            let ccc = [];//营业额
+            for(let i =0; i<res.data.data.week_order_money.length;i++){
+              aaa.push(res.data.data.week_order_money[i].date.substr(5));
+              bbb.push(res.data.data.week_order_money[i].money);
+              ccc.push(res.data.data.week_order_money[i].income_money);
+            }
+            this.myChart.setOption({
+              xAxis:  {
+                data:  aaa
+              },
+              series:  [{
+                name:  '收入',
+                data:  bbb
+              },
+                {
+                  name:  '营业额',
+                  data:  ccc
+                }
+              ]
+            });
+          }else {
+            this.$store.dispatch('getDatas',{
+              states:true,
+              msg:res.data.err_msg
+            })
+          }
+        }).catch( err =>{
+          console.log(err)
+        })
+      },
+      /* 下拉刷新 */
+      loadList() {
+        this.getAllData();
+        this.$refs.pullrefreshDemo.$emit('ydui.pullrefresh.finishLoad');
+
       }
-    }
+    },
+    filters: {
+      // 过滤对象类型的字符串
+      filterSize(value) {
+        if (value === "null") {
+          return value.replace(/null/, " ")
+        } else {
+          return value.replace(/{|}|"/g, '');
+        }
+      },
+      /* 过滤第二种情况 */
+      filterSku(value) {
+        if (value === "null") {
+          return value.toString().replace(/null/, " ")
+        } else {
+          return value.toString().replace(/\[|\]|"/g, '');
+        }
+      },
+      // 过滤字数过长的限制
+      filterStrLen(value) {
+        return (value.length >= 10) ? value.substring(0, 10) + '...' : value;
+      },
+      filterTest(value) {
+        if (value) {
+          return value;
+        } else {
+          return value = 0;
+        }
+      },
+      //  过滤时间戳
+      filterTime(value) {
+        if (value) {
+          return (value.length >= 10) ? new Date(parseInt(value) * 1000).toLocaleString().replace(/\//g, "-").substr(0, 10) : value;
+        } else {
+          console.log("nothing")
+        }
+      }
+    },
   }
 </script>
 
@@ -324,6 +412,7 @@
               height: .75rem;
               font-size: .26rem;
               color: #333333;
+              border-bottom: 1px solid #e8e8e8;
               &>td{
                 width: 25%;
               }

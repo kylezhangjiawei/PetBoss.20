@@ -9,17 +9,13 @@
       <div class="screen">
         <span>筛选</span>
         <span>
-           <select v-model="selectedYear">
+           <select v-model="value1" @change="changeYears()">
               <option disabled value="">请选择</option>
-              <option>A</option>
-              <option>B</option>
-              <option>C</option>
+              <option v-for="item in optionYear">{{item.value}}</option>
            </select>
-          <select v-model="selectedMonth">
+          <select v-model="value2" :disabled="itsTrue" @change="changeMonth()">
               <option disabled value="">请选择</option>
-              <option>A</option>
-              <option>B</option>
-              <option>C</option>
+              <option v-for="item in options">{{item.value}}</option>
            </select>
         </span>
       </div>
@@ -28,25 +24,25 @@
         <div>
           <dl>
             <dt>月收入</dt>
-            <dd>686580</dd>
+            <dd>{{allData.MonthTurnover}}</dd>
           </dl>
         </div>
         <div>
           <dl>
             <dt>月营业额</dt>
-            <dd>385620</dd>
+            <dd>{{allData.MonthIncome}}</dd>
           </dl>
         </div>
         <div>
           <dl>
             <dt>日均收入</dt>
-            <dd>265810</dd>
+            <dd>{{allData.DayAvgTurnover}}</dd>
           </dl>
         </div>
         <div>
           <dl>
             <dt>日均营业额</dt>
-            <dd>165430</dd>
+            <dd>{{allData.DayAvgIncome}}</dd>
           </dl>
         </div>
       </div>
@@ -69,16 +65,15 @@
           </tr>
           </thead>
           <tbody>
-          <tr @click="goDaily()">
-            <td>01.01</td>
-            <td>12635</td>
-            <td>9854%</td>
+          <tr @click="goDaily(item)" v-for="(item,index) in allData.Record">
+            <td>{{item.Date}}</td>
+            <td>{{item.StoreDayTurnover}}</td>
+            <td>{{item.StoreDayIncome}}</td>
           </tr>
           </tbody>
         </table>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -87,9 +82,23 @@
     name: "performance",
     data(){
       return{
-        selectedYear:'', //年份选择
-        selectedMonth:'', //
+        value1:'', //年份选择
+        value2:'', //月份儿选择
+        allData:'',//数据存放
+        itsTrue:true,//月份选择
+        startTime:'',//开始月份儿
+        StartYear:'',//开始年份儿
+        options:[],
+        optionYear:[],
+        itsYears:0,
+        itsMonth:0,
+        itsDay:0,
       }
+    },
+    created(){
+      this.getAllData();
+      this.itsYears = new Date().getFullYear();
+      this.itsMonth = new Date().getMonth()+1;
     },
     mounted(){
       this.dealStatements();
@@ -121,7 +130,7 @@
           xAxis:  {
             type:  'category',
             boundaryGap:  false,
-            data:  ['01-11',  '01-12',  '01-13',  '01-14',  '01-15',  '01-16',  '01-17']
+            data:  []
           },
           yAxis:  {
             type:  'value',
@@ -140,7 +149,6 @@
             name:  '收入',
             type:  'line',
             smooth:  'true',
-            stack:  '总量',
             label:  {
               normal:  {
                 show:  false,
@@ -158,13 +166,12 @@
                 }])
               }
             },
-            data:  [120,  132,  101,  134,  90,  230,  210]
+            data:  []
           },
             {
               name:  '营业额',
               type:  'line',
               smooth:  'true',
-              stack:  '总量',
               label:  {
                 normal:  {
                   show:  false,
@@ -187,7 +194,7 @@
                   }])
                 }
               },
-              data:  [220,  182,  191,  234,  290,  330,  310]
+              data:  []
             }
           ]
         };
@@ -196,8 +203,144 @@
         window.onresize = this.myChart.resize;
       },
       /* 日报 */
-      goDaily(){
-        this.$router.push({path:'/daily'})
+      goDaily(data){
+        this.$router.push({path:'/daily',query:{plan:data}});
+      },
+      /* 获取所有数据 */
+      getAllData(){
+        let months = Date.parse(new Date()).toString().substr(0, 10);
+        this.$http.post('https://api.yongdaoyun.com/special/pet/report_operating_data.php', this.sendData({month:months})).then(        res =>{
+          console.log(res)
+          if(res.data.err_code === "0000"){
+            this.allData = res.data.data;
+            this.startTime = res.data.data.StartMonth;
+            this.StartYear = res.data.data.StartYear;
+            let years = JSON.parse(JSON.stringify(this.itsYears));
+            if(Number(years) === Number(res.data.data.StartYear)){
+              this.optionYear.push({
+                value:res.data.data.StartYear,
+                label:res.data.data.StartYear
+              })
+            }else {
+              for(let i = res.data.data.StartYear; i<=years; i++){
+                this.optionYear.push({
+                  value:i,
+                  label:i
+                })
+              }
+            }
+            /* 图表数据 */
+            let date = [];
+            let dataStoreDayIncome = [];
+            let dataStoreDayTurnover= [];
+            for(let i = 0; i<res.data.data.Record.length; i++){
+              date.push(res.data.data.Record[i].Date);
+              dataStoreDayIncome.push(res.data.data.Record[i].StoreDayIncome);
+              dataStoreDayTurnover.push(res.data.data.Record[i].StoreDayTurnover);
+            }
+            this.myChart.setOption({
+              xAxis:  {
+                data:date
+              },
+              series:  [{
+                name:  '收入',
+                data: dataStoreDayTurnover
+              },
+                {
+                  name:  '营业额',
+                  data: dataStoreDayIncome
+                }
+              ]
+            })
+          }else {
+            this.$store.dispatch('getDatas',{
+              states:true,
+              msg:res.data.err_msg
+            })
+          }
+        }).catch( err =>{
+          console.log(err)
+        })
+      },
+      /* 改变年份儿事件 */
+      changeYears(){
+        this.value2 = '';
+        this.options = [];
+        let indexs =  this.optionYear.findIndex(item =>{return Number(item.value) === Number(this.value1)});
+        /* 获取当前年份儿 */
+        let years = new Date().getFullYear();
+        /* 获取当前月份儿 */
+        let months = new Date().getMonth()+1;
+        if(Number(indexs) === 0 && Number(years) !== Number(this.StartYear)){
+          this.itsTrue = false;
+          for(let i = Number(this.startTime); i<=12;i++){
+            this.options.push({
+              value:i,
+              label:i
+            })
+          }
+        }else if(Number(indexs) !== -1){
+          this.itsTrue = false;
+          if(Number(this.value1) === Number(years)){
+            for(let x = 1 ; x <= Number(months); x++){
+              this.options.push({
+                value:x,
+                label:x
+              })
+            }
+          }else {
+            for (let s=1; s<=12;s++){
+              this.options.push({
+                value:s,
+                label:s
+              })
+            }
+          }
+        }else {
+          this.itsTrue = true;
+        }
+      },
+      /* 改变月份儿事件 */
+      changeMonth(){
+        if(this.value1 !== '' && this.value2 !== ''){
+          let aaa = Number(this.value1) + '/' + Number(this.value2) + '/' + 1 + ' 00:00:00';
+          let choiceDate = Date.parse(new Date(aaa)) / 1000;
+          this.$http.post('https://api.yongdaoyun.com/special/pet/report_operating_data.php', this.sendData({month:choiceDate})).then( res =>{
+            if(res.data.err_code === "0000"){
+              this.allData = res.data.data;
+              /* 图表数据 */
+              let date = [];
+              let dataStoreDayIncome = [];
+              let dataStoreDayTurnover= [];
+              for(let i = 0; i<res.data.data.Record.length; i++){
+                date.push(res.data.data.Record[i].Date);
+                dataStoreDayIncome.push(res.data.data.Record[i].StoreDayIncome);
+                dataStoreDayTurnover.push(res.data.data.Record[i].StoreDayTurnover);
+              }
+              this.myChart.setOption({
+                xAxis:  {
+                  data:date
+                },
+                series:  [{
+                  name:  '收入',
+                  data: dataStoreDayTurnover
+                },
+                  {
+                    name:  '营业额',
+                    data: dataStoreDayIncome
+                  }
+                ]
+              })
+            }else {
+              this.$store.dispatch('getDatas',{
+                states:true,
+                msg:res.data.err_msg
+              })
+            }
+          }).catch( err =>{
+
+          })
+        }
       }
     }
   }
@@ -351,6 +494,7 @@
               height: .75rem;
               font-size: .26rem;
               color: #333333;
+              border-bottom: 1px solid #e8e8e8;
               &>td{
                 width: 25%;
               }

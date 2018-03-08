@@ -7,49 +7,45 @@
     <!-- 内容区域 -->
     <div class="container">
       <div class="itemTop">
-        <div>
+        <div v-for="item in allDatas.order_item">
           <div>
             <dl>
-              <dt>Panate/皮纳特 贵宾/小鹿犬/泰迪(中型犬)成犬鸡肉味专用粮 2500g</dt>
-              <dd>&yen; 80 X 2</dd>
+              <dt>{{item.name}}</dt>
+              <dd>&yen; {{item.price}} X {{item.num}}</dd>
             </dl>
           </div>
-          <div>&yen; 160</div>
-        </div>
-        <div>
-          <div>
-            <dl>
-              <dt>点点全套洗澡</dt>
-              <dd>&yen; 50 服务 : 小美</dd>
-            </dl>
-          </div>
-          <div>&yen; 50</div>
+          <div>&yen; {{item.total_price}}</div>
         </div>
       </div>
       <div class="itemCenter">
-        <p><em>张浩川</em><em>18000187588</em></p>
+        <p><em>{{allDatas.name}}</em><em>{{allDatas.phone}}</em></p>
         <div>
           <div>
             <span>收银员 : </span>
-            <span>朵朵</span>
+            <span>{{allDatas.author}}</span>
           </div>
           <div>
             <span>收款方式 : </span>
-            <span>扫码</span>
+            <span v-if='allDatas.pay_method === "1"'>现金</span>
+            <span v-else-if='allDatas.pay_method === "2"'>刷卡</span>
+            <span v-else-if='allDatas.pay_method === "3"'>扫码</span>
+            <span v-else-if='allDatas.pay_method === "4"'>储值</span>
+            <span v-else>混合</span>
           </div>
         </div>
         <div>
           <div>
             <span>优惠方式 : </span>
-            <span>金卡会员卡9.0折</span>
+            <!--<span>金卡会员卡9.0折</span>-->
+            <span v-if='allDatas.card_info.Title && allDatas.card_info.Title !== ""'>{{allDatas.card_info.GoodsDiscount !=="" ? allDatas.card_info.Title+allDatas.card_info.GoodsDiscount+'折':''}} {{allDatas.card_info.ServiceDiscount !== "" ? allDatas.card_info.Title+allDatas.card_info.ServiceDiscount+'折':''}}</span>
           </div>
           <div>
             <span>折扣金额 : </span>
-            <span>&yen; 1.5</span>
+            <span>&yen; {{allDatas.discount_goods_price === null ? '0':allDatas.discount_goods_price}}</span>
           </div>
           <div>
             <span>储值支付 : </span>
-            <span>&yen; 13.5</span>
+            <span>&yen; {{allDatas.balance_price === null ? '0' : allDatas.balance_price}}</span>
           </div>
         </div>
       </div>
@@ -57,35 +53,42 @@
         <div>
           <div>
             <span>合计金额 : </span>
-            <span>&yen; 210</span>
+            <span>&yen; {{allDatas.total_price}}</span>
           </div>
           <div>
             <span>应收金额 : </span>
-            <span>&yen; 80</span>
+            <span>&yen; {{allDatas.amount_price}}</span>
           </div>
         </div>
         <p>
-          <span>实收金额 : <em> &yen; 80</em></span>
+          <span>实收金额 : <em> &yen; {{allDatas.actual_price}}</em></span>
         </p>
       </div>
     </div>
     <!-- 商标 -->
     <div class="footer">
-      <span>&copy;2018 用道云 {{copy}}</span>
+      <span>&copy; 2018 用道云 {{copy}}</span>
     </div>
   </div>
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   export default {
     name: "daily-deatil",
     data(){
       return{
-        copy: '',//版本号
+        allDatas:'',//所有数据
       }
     },
+    computed:{
+      ...mapGetters([
+        'copy'
+      ])
+    },
     created() {
-      this.copy = copy;
+      console.log(this.$route.query.plan);
+      this.allDatas = this.$route.query.plan;
     },
     methods: {
       /* 返回上一层 */

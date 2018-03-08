@@ -51,7 +51,6 @@
               </yd-cell-group>
               <yd-cityselect v-model="show1" :callback="result1" :items="district"></yd-cityselect>
             </div>
-            <i class="icon-gengduo"></i>
           </li>
         </ul>
       </div>
@@ -68,18 +67,18 @@
 
     </div>
     <div class="footer">
-      <span>&copy;2018 用道云 {{copy}}</span>
+      <span>&copy; 2018 用道云 {{copy}}</span>
     </div>
   </div>
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   import District from 'ydui-district/dist/jd_province_city_area_id';
   export default {
     name: "sign-up",
     data() {
       return {
-        copy: '',//版本号
         user:{
           name:'',
           phone:'',
@@ -96,8 +95,13 @@
         district: District
       }
     },
+    computed:{
+      ...mapGetters([
+        'copy'
+      ])
+    },
     created() {
-      this.copy = copy;
+
     },
     methods: {
       /* 返回 */
@@ -390,6 +394,20 @@
         width: 100%;
         text-align: center;
       }
+    }
+  }
+</style>
+<style lang="scss">
+  .signUp{
+    .yd-cell-box{
+      margin-bottom: 0;
+      height: .91rem;
+    }
+    .yd-cell{
+      height: .91rem;
+    }
+    .yd-cell:after{
+      border-bottom: 1px solid #e8e8e8;
     }
   }
 </style>

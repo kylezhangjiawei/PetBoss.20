@@ -5,7 +5,8 @@ const state={
   key:localStorage.getItem('Key') || {},
   names:localStorage.getItem('Name') || {},
   userName:localStorage.getItem('userName') || {},
-  userPhone:localStorage.getItem('userPhone') || {}
+  userPhone:localStorage.getItem('userPhone') || {},
+  userOverdue:localStorage.getItem('userOverdue') || {}
 }
 
 const mutations={
@@ -26,6 +27,9 @@ const mutations={
   },
   userPhone(state,userphone){
     localStorage.setItem('userPhone',userphone)
+  },
+  userOverdue(state,useroverdue){
+    localStorage.setItem('userOverdue',useroverdue)
   }
 }
 
@@ -50,6 +54,7 @@ const actions ={
         let key ='';
         let name = '';
         let usernames = '';
+        let useroverdues = '';
         let userphone = res.data.phone;
         store.forEach( (item,index,array) =>{
           console.log(item.store_id);
@@ -57,6 +62,7 @@ const actions ={
           key = item.key;
           name = item.store_name;
           usernames = item.user_name;
+          useroverdues = item.is_overdue;
         })
         commit('userSignIn',res.data.sign);
         commit('userStoreId',ids);
@@ -64,6 +70,7 @@ const actions ={
         commit('userName',name);
         commit('userNames',usernames);
         commit('userPhone',userphone);
+        commit('userOverdue',useroverdues);
       } else {
         let ids = '';
         commit('userStoreId',ids);

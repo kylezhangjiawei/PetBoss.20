@@ -34,17 +34,18 @@
       </div>
     </div>
     <div class="footer">
-      <span>&copy;2018 用道云 {{copy}}</span>
+      <span>&copy; 2018 用道云 {{copy}}</span>
     </div>
   </div>
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
+  import {Confirm, Alert, Toast, Notify, Loading} from 'vue-ydui/dist/lib.rem/dialog';
   export default {
     name: "reset-password",
     data() {
       return {
-        copy:'',//版本号
         user:{
           phone:'',
           code:'',
@@ -55,8 +56,13 @@
         getCode:true, //验证码转换
       }
     },
+    computed:{
+      ...mapGetters([
+        'copy'
+      ])
+    },
     created() {
-      this.copy = copy;
+
     },
     methods: {
       /* 返回 */
@@ -95,6 +101,10 @@
           console.log(respone);
           if (respone.data.err_code === "0000") {
             this.getCode = false;
+            Toast({
+              mes: '已发送验证码！',
+              timeout: 2000
+            });
             let clock = setInterval(() => {
               if ((this.time--) <= 0) {
                 this.time = 60;

@@ -10,9 +10,15 @@ import product from  '../components/index/product'
 import performance from '../components/index/performance'
 import daily from '../components/index/performance/daily'
 import dailyDetail from '../components/index/performance/dailyDetail/dailyDeatil'
+import detail from '../components/index/peopel/detail'
+import peopleManagement from '../components/index/peopel/peopleManagement'
+import addPeople from '../components/index/peopel/addPeople/addPeople'
+import peopleManagementDetail from '../components/index/peopel/peopleManagementDetail/peopleManagementDetail'
+import productDetail from '../components/index/product/productDetail'
 Vue.use(Router)
 
 const router= new Router({
+  // mode:'history',
   routes: [
     {
       path: '/',
@@ -51,6 +57,31 @@ const router= new Router({
       path: '/dailyDetail',
       name: 'dailyDetail',
       component: dailyDetail
+    },
+    {
+      path: '/detail',
+      name: 'detail',
+      component: detail
+    },
+    {
+      path: '/peopleManagement',
+      name: 'peopleManagement',
+      component: peopleManagement
+    },
+    {
+      path: '/addPeople',
+      name: 'addPeople',
+      component: addPeople
+    },
+    {
+      path: '/peopleManagementDetail',
+      name: 'peopleManagementDetail',
+      component: peopleManagementDetail
+    },
+    {
+      path: '/productDetail',
+      name: 'productDetail',
+      component: productDetail
     },
   ]
 })

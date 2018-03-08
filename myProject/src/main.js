@@ -11,21 +11,34 @@ import '../static/icon/iconfont.css'
 import { Confirm, Alert, Toast, Notify, Loading } from 'vue-ydui/dist/lib.rem/dialog';
 import {Popup} from 'vue-ydui/dist/lib.rem/popup';
 import {CitySelect} from 'vue-ydui/dist/lib.rem/cityselect';
+import {DateTime} from 'vue-ydui/dist/lib.rem/datetime';
+import {CellGroup, CellItem} from 'vue-ydui/dist/lib.rem/cell';
+import {Tab, TabPanel} from 'vue-ydui/dist/lib.rem/tab';
+import {PullRefresh} from 'vue-ydui/dist/lib.rem/pullrefresh';
 import echarts from 'echarts'
+import $ from 'jquery';
 
 /* 启用Vuex状态管理 */
 Vue.use(Vuex);
+
+/* 启用YDUI */
+Vue.use(YDUI);
 
 /* YDUI-Popup */
 Vue.component(Popup.name, Popup);
 /* YDUI省市联动 */
 Vue.component(CitySelect.name, CitySelect);
+/* YDUI时间组件 */
+Vue.component(DateTime.name, DateTime);
+/* YDUI表单 */
+Vue.component(CellGroup.name, CellGroup);
+Vue.component(CellItem.name, CellItem);
+/* ydui选项卡 */
+Vue.component(Tab.name, Tab);
+Vue.component(TabPanel.name, TabPanel);
+/* YDUI下拉刷新 */
+Vue.component(PullRefresh.name, PullRefresh);
 
-/* 启用YDUI */
-Vue.use(YDUI);
-
-/* API */
-// import 'configuration/api'
 
 /* 对VUE添加通用方法(数据请求的加密) */
 import {getSendData,sendData} from '../static/configuration/encryptionOne'
@@ -43,7 +56,7 @@ Vue.prototype.$http = axios;
 Vue.prototype.$echarts = echarts;
 
 /* 版本号 */
-global.copy = "1.0.14";
+/*global.copy = "1.0.14";*/
 
 Vue.config.productionTip = false
 
@@ -125,8 +138,10 @@ const accordion = Vue.extend({
   template: `
         <div class="foldContainer">
             <div class="foldHeader">
+               <slot name="itsHeader">
                 <slot name="headerLeft"></slot>
                 <slot name="headerRight"></slot>
+               </slot>     
             </div>
             <div class="foldBody">      
                 <slot name="body"></slot>   
@@ -135,4 +150,21 @@ const accordion = Vue.extend({
   `
 })
 Vue.component('fold',accordion);
+
+//app中页面高度被撑起解决方案
+window.onload=function(e){
+  var _body=document.getElementsByTagName('body')[0];
+  _body.style.height=_body.clientHeight+"px";
+};
+//APP中点击输入键盘顶起底部内容解决方案
+var h = $(window).height();
+$(window).resize(function(){
+  if($(window).height() < h ){
+    $('.footer').css("z-index","-1");
+  }
+  if($(window).height() >= h){
+    $('.footer').css("z-index","1");
+  }
+});
+
 
