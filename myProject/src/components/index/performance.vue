@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div class="performance">
     <header>
       <span>经营数据</span>
@@ -45,6 +45,30 @@
             <dd>{{allData.DayAvgIncome}}</dd>
           </dl>
         </div>
+        <div>
+          <dl>
+            <dt>月商品销售额</dt>
+            <dd>{{allData.GoodsIncome}}</dd>
+          </dl>
+        </div>
+        <div>
+          <dl>
+            <dt><span>月可计算毛利销售额</span><span @click="modalsOpen(1)"><em></em></span></dt>
+            <dd>{{allData.GoodsProfitIncome}}</dd>
+          </dl>
+        </div>
+        <div>
+          <dl>
+            <dt><span>月商品毛利总额</span><span @click="modalsOpen(2)"><em></em></span></dt>
+            <dd>{{allData.GoodsProfit}}</dd>
+          </dl>
+        </div>
+        <div>
+          <dl>
+            <dt><span>月商品毛利率</span><span @click="modalsOpen(3)"><em></em></span></dt>
+            <dd>{{allData.GoodsRate}}</dd>
+          </dl>
+        </div>
       </div>
       <!-- 月交易额图表 -->
       <div class="dealStatement">
@@ -74,6 +98,16 @@
         </table>
       </div>
     </div>
+    <!-- 提示框组件 -->
+    <modal v-if="msgModal">
+      <div slot="body" class="modalBodys">
+        <p>{{topMsg}}</p>
+        <p>{{bottomMsg}}</p>
+      </div>
+      <div slot="footer" class="modalFooters">
+        <span @click="msgModal = false">知道了</span>
+      </div>
+    </modal>
   </div>
 </template>
 
@@ -93,6 +127,9 @@
         itsYears:0,
         itsMonth:0,
         itsDay:0,
+        msgModal:false,
+        topMsg:'',//模态框信息
+        bottomMsg:'',//模态框信息
       }
     },
     created(){
@@ -341,6 +378,23 @@
 
           })
         }
+      },
+      /* 模态框信息 */
+      modalsOpen(val){
+        this.msgModal = true;
+        if(val === 1){
+          this.topMsg = "有成本价的商品销售总额";
+          this.bottomMsg = "（已经入库填写过单价的商品）";
+        }else if (val ===2){
+          this.topMsg = "只计算有成本价的商品毛利";
+          this.bottomMsg = "（已经入库填写过单价的商品）";
+        }else if(val === 3){
+          this.topMsg = "商品毛利总额 / 可计算毛利销售总额";
+          this.bottomMsg = "";
+        }else {
+          this.topMsg = "";
+          this.bottomMsg = "";
+        }
       }
     }
   }
@@ -445,6 +499,83 @@
             }
           }
         }
+        &>div:nth-of-type(5){
+          border-right: 1px solid #e8e8e8;
+          border-bottom: 1px solid #e8e8e8;
+          border-top: 1px solid #e8e8e8;
+          &>dl{
+            &>dd{
+              color: #191818;
+            }
+          }
+        }
+        &>div:nth-of-type(6){
+          border-bottom: 1px solid #e8e8e8;
+          border-top: 1px solid #e8e8e8;
+          &>dl{
+            &>dt{
+              padding-right: .3rem;
+              display: flex;
+              justify-content: space-between;
+              &>span{
+                &>em{
+                  display: inline-block;
+                  background: url("../../assets/question1.png") 50% 50% no-repeat;
+                  width: .22rem;
+                  height: .22rem;
+                  background-size: contain;
+                }
+              }
+            }
+            &>dd{
+              color: #191818;
+            }
+          }
+        }
+        &>div:nth-of-type(7){
+          border-right: 1px solid #e8e8e8;
+          &>dl{
+            &>dt{
+              padding-right: .3rem;
+              display: flex;
+              justify-content: space-between;
+              &>span{
+                &>em{
+                  display: inline-block;
+                  background: url("../../assets/question1.png") 50% 50% no-repeat;
+                  width: .22rem;
+                  height: .22rem;
+                  background-size: contain;
+                }
+              }
+            }
+            &>dd{
+              color: #191818;
+            }
+          }
+        }
+        &>div:nth-of-type(8){
+          border-right: 1px solid #e8e8e8;
+          &>dl{
+            &>dt{
+              padding-right: .3rem;
+              display: flex;
+              justify-content: space-between;
+              &>span{
+                &>em{
+                  display: inline-block;
+                  background: url("../../assets/question1.png") 50% 50% no-repeat;
+                  width: .22rem;
+                  height: .22rem;
+                  background-size: contain;
+                }
+              }
+            }
+            &>dd{
+              color: #191818;
+            }
+          }
+        }
       }
       .dealStatement {
         height: 305px;
@@ -514,6 +645,30 @@
           }
         }
       }
+    }
+    .modalBodys{
+      padding: .3rem;
+      font-size: .34rem;
+      text-align: center;
+      &>p:nth-of-type(1){
+        margin-bottom: .1rem;
+        color: #333333;
+      }
+      &>p:nth-of-type(2){
+        color: #999999;
+      }
+    }
+    .modalFooters{
+      height: .8rem;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      background-color: #fa6034;
+      color: #ffffff;
+      font-size: .34rem;
+      border-bottom-left-radius: 0.08rem;
+      border-bottom-right-radius: 0.08rem;
     }
   }
 </style>

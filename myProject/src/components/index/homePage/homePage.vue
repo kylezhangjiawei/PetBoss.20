@@ -1,11 +1,12 @@
 <template>
-  <yd-pullrefresh :callback="loadList" ref="pullrefreshDemo" drop-text="下拉刷新">
+
     <div class="homePage">
       <header>
         <i class="icon-fenlei" @click="leftModal = true"></i>
         <span>{{shopName}}</span>
         <i class="icon-pinglun"></i>
       </header>
+      <yd-pullrefresh :callback="loadList" ref="pullrefreshDemo" drop-text="下拉刷新">
       <div class="container">
         <!-- 页头数据块儿 -->
         <div class="dataChunk">
@@ -62,6 +63,7 @@
           </table>
         </div>
       </div>
+      </yd-pullrefresh>
       <!-- 左侧弹窗 -->
       <yd-popup v-model="leftModal" position="left" width="70%">
         <div class="shopIcon">
@@ -76,7 +78,6 @@
         </div>
       </yd-popup>
     </div>
-  </yd-pullrefresh>
 
 </template>
 
@@ -310,7 +311,7 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 1;
+      z-index: 100;
       color: #ffffff;
       & > i:nth-of-type(1) {
         position: absolute;
@@ -326,7 +327,7 @@
       }
     }
     .container {
-      margin-top: 1rem;
+      padding-top: 1rem;
       .dataChunk {
         display: flex;
         justify-content: flex-start;

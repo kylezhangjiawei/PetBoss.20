@@ -1,5 +1,5 @@
 const state={
-  copy:'2.0.2'
+  copy:'2.0.4'
 }
 const getters={
   copy:state =>{

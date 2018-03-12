@@ -118,7 +118,7 @@
                 <div>
                   <dl>
                     <dt>{{item.goods_name}}</dt>
-                    <dd>{{ item.sku !== "null" && item.sku !=="" && item.sku !== null ? Object.values(JSON.parse(item.sku)) : '' | filterSku}}</dd>
+                    <dd>{{ item.sku !== "null" && item.sku !=="" && item.sku !== null ? Object.values(JSON.parse(item.sku)) : '' | filterSku}} &nbsp;销售额 ：&yen;{{item.sale_price}} &nbsp;毛利 ：{{item.profit_price !=="" ? "￥"+item.profit_price:'/'}} &nbsp;毛利率 ：{{item.goods_rate !=="" ? item.goods_rate+"%":'/'}}</dd>
                   </dl>
                 </div>
                 <div>
@@ -260,6 +260,50 @@
               </div>
             </div>
           </fold>
+          <fold>
+            <div slot="itsHeader" class="itsHeaders" @click="choiceList(7)">
+              <span slot="headerLeft">直接收银清单 <yd-badge shape="circle" bgcolor="#FDDCCE" color="#ec652c">{{numbers}}件</yd-badge></span>
+              <span slot="headerRight"><i class="icon-shouqi" :class="[indexs === 7 ? 'activess' : '']"></i></span>
+            </div>
+            <div slot="body" v-if="indexs === 7">
+              <div class="storeBody" v-for="item in allDatas.CashierRecord">
+                <div>
+                  <dl>
+                    <dt>{{item.goods_name}}</dt>
+                  </dl>
+                </div>
+                <div>
+                  &yen;{{item.sale_price}}<em style="color: #C6C6C6;font-size: .22rem">(共{{item.goods_num}})</em>
+                </div>
+              </div>
+            </div>
+          </fold>
+          <fold>
+            <div slot="itsHeader" class="itsHeaders" @click="choiceList(8)">
+              <span slot="headerLeft">驱虫清单 <yd-badge shape="circle" bgcolor="#FDDCCE" color="#ec652c">{{allDatas.InsectRecord ? allDatas.InsectRecord.length : '0'}}单</yd-badge></span>
+              <span slot="headerRight" ><i class="icon-shouqi" :class="[indexs === 8 ? 'activess' : '']"></i></span>
+            </div>
+            <div slot="body" v-if="indexs === 8">
+              <div class="foldBodyStyle" v-for="item in allDatas.InsectRecord">
+                <p class="foldOne">
+                  <span><em>{{item.MemberName ? item.MemberName : '非会员'}}</em><em><!--{{item.TransactionId ? item.TransactionId:''}}--></em></span>
+                  <span>{{item.AddDate}}</span>
+                </p>
+                <p class="foldTwo" v-for="items in item.insect">
+                  <span style="width: 100%;">
+                    <dl>
+                      <dt>{{items.PetName}}({{items.VarietyName}})</dt>
+                      <dd style="display: flex;justify-content: space-between;" v-for="itemss in items.insect_son">{{itemss.Method}} <span><em style="margin-right: .5rem;">{{itemss.StaffName}}</em><em>&yen;{{Number(itemss.InsectDiscountPrice)}}</em></span></dd>
+                    </dl>
+                  </span>
+                  <!--<span v-for="itemss in items.insect_son">
+                    <em>{{itemss.StaffName}}</em>
+                    <em>&yen;{{itemss.InsectDiscountPrice}}</em>
+                  </span>-->
+                </p>
+              </div>
+            </div>
+          </fold>
         </div>
         <!-- 当日流水 -->
         <div class="waterLine">
@@ -289,6 +333,30 @@
                 <dd>{{today.StoreDayTimes}}</dd>
               </dl>
             </div>
+            <div>
+              <dl>
+                <dt>商品销售额</dt>
+                <dd>{{today.GoodsIncome}}</dd>
+              </dl>
+            </div>
+            <div>
+              <dl>
+                <dt><span>可计算毛利销售额</span><span @click="modalsOpen(1)"><em></em></span></dt>
+                <dd>{{today.GoodsProfitIncome}}</dd>
+              </dl>
+            </div>
+            <div>
+              <dl>
+                <dt><span>商品毛利总额</span><span @click="modalsOpen(2)"><em></em></span></dt>
+                <dd>{{today.GoodsProfit}}</dd>
+              </dl>
+            </div>
+            <div>
+              <dl>
+                <dt><span>商品毛利率</span><span @click="modalsOpen(3)"><em></em></span></dt>
+                <dd>{{today.GoodsRate}}</dd>
+              </dl>
+            </div>
           </div>
           <div @click="goDailyDetail(item)" v-for="(item,index) in today.record" class="record">
             <div>
@@ -311,6 +379,16 @@
           </div>
         </div>
       </div>
+      <!-- 提示框组件 -->
+      <modal v-if="msgModal">
+        <div slot="body" class="modalBodys">
+          <p>{{topMsg}}</p>
+          <p>{{bottomMsg}}</p>
+        </div>
+        <div slot="footer" class="modalFooters">
+          <span @click="msgModal = false">知道了</span>
+        </div>
+      </modal>
     </div>
 </template>
 
@@ -328,6 +406,9 @@
           itDay: '',
           today:'',//今日流水接口数据
           test:true,
+          msgModal:false,
+          topMsg:'',//模态框信息
+          bottomMsg:'',//模态框信息
         }
       },
       beforeRouteLeave (to, from , next) {
@@ -353,20 +434,28 @@
             }
           }
           return allNums;
+        },
+        numbers(){
+          let allNums = 0;
+          if(this.allDatas){
+            for(let i = 0 ;i<this.allDatas.CashierRecord.length;i++){
+              allNums += Number(this.allDatas.CashierRecord[i].goods_num)
+            }
+          }
+          return allNums;
         }
       },
-      activated(){
-        if(this.test === true){
+      activated() {
+        if (this.test === true) {
           this.routeData = this.$route.query.plan;
           this.itYear = JSON.parse(JSON.stringify(this.$route.query.plan.Year));
           this.itMonth = JSON.parse(JSON.stringify(this.$route.query.plan.Month));
           this.itDay = JSON.parse(JSON.stringify(this.$route.query.plan.Day));
           this.getAllData();
           this.toDayData();
-        }else {
+        } else {
           console.log('2');
         }
-
       },
       methods:{
         choiceList(val){
@@ -701,6 +790,23 @@
             console.log(err)
           })
         },
+        /* 模态框信息 */
+        modalsOpen(val){
+          this.msgModal = true;
+          if(val === 1){
+            this.topMsg = "有成本价的商品销售总额";
+            this.bottomMsg = "（已经入库填写过单价的商品）";
+          }else if (val ===2){
+            this.topMsg = "只计算有成本价的商品毛利";
+            this.bottomMsg = "（已经入库填写过单价的商品）";
+          }else if(val === 3){
+            this.topMsg = "商品毛利总额 / 可计算毛利销售总额";
+            this.bottomMsg = "";
+          }else {
+            this.topMsg = "";
+            this.bottomMsg = "";
+          }
+        }
       },
       filters: {
         // 过滤对象类型的字符串
@@ -1021,6 +1127,70 @@
         & > div:nth-of-type(4) {
           padding-left: .3rem;
         }
+        & > div:nth-of-type(5) {
+          border-right: 1px solid #e8e8e8;
+          border-bottom: 1px solid #e8e8e8;
+          border-top: 1px solid #e8e8e8;
+        }
+        & > div:nth-of-type(6) {
+          border-bottom: 1px solid #e8e8e8;
+          border-top: 1px solid #e8e8e8;
+          padding-left: .3rem;
+          &>dl{
+            &>dt{
+              padding-right: .3rem;
+              display: flex;
+              justify-content: space-between;
+              &>span{
+                &>em{
+                  display: inline-block;
+                  background: url("../../../assets/question1.png") 50% 50% no-repeat;
+                  width: .22rem;
+                  height: .22rem;
+                  background-size: contain;
+                }
+              }
+            }
+          }
+        }
+        & > div:nth-of-type(7) {
+          border-right: 1px solid #e8e8e8;
+          &>dl{
+            &>dt{
+              padding-right: .3rem;
+              display: flex;
+              justify-content: space-between;
+              &>span{
+                &>em{
+                  display: inline-block;
+                  background: url("../../../assets/question1.png") 50% 50% no-repeat;
+                  width: .22rem;
+                  height: .22rem;
+                  background-size: contain;
+                }
+              }
+            }
+          }
+        }
+        & > div:nth-of-type(8) {
+          padding-left: .3rem;
+          &>dl{
+            &>dt{
+              padding-right: .3rem;
+              display: flex;
+              justify-content: space-between;
+              &>span{
+                &>em{
+                  display: inline-block;
+                  background: url("../../../assets/question1.png") 50% 50% no-repeat;
+                  width: .22rem;
+                  height: .22rem;
+                  background-size: contain;
+                }
+              }
+            }
+          }
+        }
       }
       .record{
         border-top: 1px solid #e8e8e8;
@@ -1102,6 +1272,7 @@
               &>dt{
                 font-size: .24rem;
                 color: #555555;
+                margin-bottom: .08rem;
               }
               &>dd{
                 font-size: .24rem;
@@ -1183,6 +1354,30 @@
         }
       }
     }
+  }
+  .modalBodys{
+    padding: .3rem;
+    font-size: .34rem;
+    text-align: center;
+    &>p:nth-of-type(1){
+      margin-bottom: .1rem;
+      color: #333333;
+    }
+    &>p:nth-of-type(2){
+      color: #999999;
+    }
+  }
+  .modalFooters{
+    height: .8rem;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #fa6034;
+    color: #ffffff;
+    font-size: .34rem;
+    border-bottom-left-radius: 0.08rem;
+    border-bottom-right-radius: 0.08rem;
   }
   .chartActive{
     background-color: #4B5060;

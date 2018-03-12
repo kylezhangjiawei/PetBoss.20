@@ -146,4 +146,71 @@ export default {
    padding-top: .1rem;
    text-align: center;
  }
+ /* 模态框样式 */
+ .modal-mask {
+   position: fixed;
+   z-index: 9998;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background-color: rgba(0, 0, 0, .5);
+   display: table;
+   transition: opacity .3s ease;
+ }
+
+ .modal-wrapper {
+   display: table-cell;
+   vertical-align: middle;
+ }
+
+ .modal-container {
+   width: 5.6rem;
+   margin: 0px auto;
+   background-color: #fff;
+   border-radius: 0.08rem;
+   transition: all .3s ease;
+   font-family: Helvetica, Arial, sans-serif;
+   min-height: 1rem;
+ }
+
+ .modal-header {
+   /*height: 0.9rem;*/
+   font-size: 0.26rem;
+   background-color: #f6f6f6;
+   color: #333;
+   /*line-height: 0.9rem;*/
+   border-top-left-radius: 0.08rem;
+   border-top-right-radius: 0.08rem;
+ }
+
+ .modal-body {
+   /*height: 2.4rem;*/
+   /*border-bottom: 0.01rem solid #e8e8e8;*/
+   font-size: 0.26rem;
+ }
+ .modal-footer{
+   /*height: 1rem;*/
+ }
+ .modal-footer div{
+   display: flex;
+   justify-content: flex-start;
+ }
+ .modal-default-button {
+   float: right;
+ }
+
+ .modal-enter {
+   opacity: 0;
+ }
+
+ .modal-leave-active {
+   opacity: 0;
+ }
+
+ .modal-enter .modal-container,
+ .modal-leave-active .modal-container {
+   -webkit-transform: scale(1.1);
+   transform: scale(1.1);
+ }
 </style>

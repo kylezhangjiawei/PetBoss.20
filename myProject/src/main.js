@@ -151,6 +151,34 @@ const accordion = Vue.extend({
 })
 Vue.component('fold',accordion);
 
+//模态框组件
+var myComponent = Vue.extend({
+  template:'  <transition name="modal">\n' +
+  '    <div class="modal-mask">\n' +
+  '      <div class="modal-wrapper">\n' +
+  '        <div class="modal-container">\n' +
+  '\n' +
+  '          <div class="modal-header">\n' +
+  '            <slot name="header">\n' +
+  '            </slot>\n' +
+  '          </div>\n' +
+  '\n' +
+  '          <div class="modal-body">\n' +
+  '            <slot name="body">\n' +
+  '            </slot>\n' +
+  '          </div>\n' +
+  '\n' +
+  '          <div class="modal-footer">\n' +
+  '            <slot name="footer">\n' +
+  '            </slot>\n' +
+  '          </div>\n' +
+  '        </div>\n' +
+  '      </div>\n' +
+  '    </div>\n' +
+  '  </transition>'
+});
+Vue.component('modal',myComponent);
+
 //app中页面高度被撑起解决方案
 window.onload=function(e){
   var _body=document.getElementsByTagName('body')[0];
